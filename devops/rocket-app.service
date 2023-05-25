@@ -1,0 +1,17 @@
+[Unit]
+Description=Rocket App Service
+After=network.target
+
+[Service]
+User=rust-svc
+Group=rust-svc
+WorkingDirectory=/opt/rust-svc
+Environment="ROCKET_ENV=prod"
+Environment="ROCKET_ADDRESS=0.0.0.0"
+Environment="ROCKET_PORT=8000"
+Environment="ROCKET_DATABASES={sqlite={url=./db.sqlite3}}"
+ExecStart=/opt/rust-svc/rocket-app --port 8000
+
+[Install]
+WantedBy=multi-user.target
+

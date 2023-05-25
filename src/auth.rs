@@ -1,9 +1,10 @@
+use base64::{engine::general_purpose, Engine as _};
 use rocket::{
-    request::{self, FromRequest, Request, Outcome},
     http::Status,
+    request::{self, FromRequest, Outcome, Request},
 };
-use base64::{Engine as _, engine::general_purpose};
 
+#[derive(Debug)]
 pub struct BasicAuth {
     pub username: String,
     pub password: String,
@@ -12,16 +13,17 @@ pub struct BasicAuth {
 impl BasicAuth {
     fn from_authorization_header(header: &str) -> Option<BasicAuth> {
         let split = header.split_whitespace().collect::<Vec<_>>();
-        if split.len() != 2 {
+
+        if split.len() != 2 || split[0] != "Basic" {
             return None;
         }
 
-        if split[0] != "Basic" {
-            return None;
+        match Self::from_base64(split[1]) {
+            Some(a) if a.username == "foo" && a.password == "bar" => {
+                Some(a)
+            }
+            _ => None,
         }
-        
-        Self::from_base64(split[1])
-        
     }
 
     fn from_base64(encoded: &str) -> Option<BasicAuth> {
